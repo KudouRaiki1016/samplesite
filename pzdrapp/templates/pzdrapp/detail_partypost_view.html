@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pzdrapp %}
+{% block title %}{{ object.title }}{% endblock title %}
+{% block header %}
+<!-- Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet"/>
+<link rel="stylesheet" type="text/css" href="{% static 'pzdrapp/css/detail_partypost.css' %}">
+{% endblock header %}
+{% block h1 %}投稿詳細{% endblock %}
+{% block content %}
+  <div class="partypost_area">
+    <h2 class="t-center partypost_title_dis" id="partypost_title">{{ object.title }}</h2>
+    <div class="partypost_user_dis d-flex">
+        <h3>投稿者</h3>
+          {% if object.user.profile.image %}
+            <p class="profile_img"><img src="{{ object.user.profile.image.url }}" alt="プロフィール画像"></p>
+          {% else %}
+            <p class="profile_img_substitute"></p>
+          {% endif %}
+    </div>
+    <div class="partypost_text_dis">
+        <h3>説明欄</h3>
+        <p class="partypost_text">{{ object.text }}</p>
+    </div>
+    <!-- ↓いいね表示↓ -->
+    <div class="like_for_partypost_dis">
+        {% if is_user_liked_for_partypost %}
+        <button type="button" class="ajax-like-for-partypost" id="ajax-like-for-partypost" style="border:none;background:none">
+            <i class="fas fa-heart text-danger" id="like-for-partypost-icon"></i>
+        </button>
+        {% else %}
+        <button type="button" class="ajax-like-for-partypost" id="ajax-like-for-partypost" style="border:none;background:none">
+            <i class="far fa-heart text-danger" id="like-for-partypost-icon"></i>
+        </button>
+        {% endif %}
+        <!-- イイねの数 -->
+        <span id="like-for-partypost-count">{{ like_for_partypost_count }}</span>
+        <span>件のイイね</span>
+    </div>
+    <!-- ↑いいね表示↑ -->
+    <!-- ↓コメント表示↓ -->
+    <section class="comment-replySec">
+      <h3 class="t-center">コメント欄</h3>
+      {% for message in messages %}
+      <div {% if message.tags %}class="{{ message.tags }}"{% endif %}>
+          {{ message }}
+      </div>
+      {% endfor %}
+      <!-- コメントフォーム -->
+      <form method="POST">
+        {% csrf_token %}
+        <textarea class="input_comment_area" name="comment" rows="4" placeholder="コメントを入力してください"></textarea>
+      <button class="comment_button" type="submit"><i class="fas fa-comment"></i> コメントする</button>
+      </form>
+      {% for comment in comment_list %}
+        {% include 'comment/comment_template.html' %}
+      {% endfor %}
+    </section>
+  </div>
+
+
+
+    <!-- ↓いいね処理↓ -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.0.0/mdb.min.js"></script>
+    <script type="text/javascript">
+        const likePartyPostButtons = document.getElementsByClassName("ajax-like-for-partypost");
+        /* ポストに対するイイね */
+        document.getElementById('ajax-like-for-partypost').addEventListener('click', e => {
+          e.preventDefault();
+          const url = '{% url "like_for_partypost" %}';
+            fetch(url, {
+            method: 'POST',
+            body: `partypost_pk={{object.pk}}`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+          }).then(response => {
+            return response.json();
+          }).then(response => {
+            // イイね数を書き換える
+            const counter = document.getElementById('like-for-partypost-count')
+            counter.textContent = response.like_for_partypost_count
+            const icon = document.getElementById('like-for-partypost-icon')
+            // 作成した場合はハートを塗る
+            if (response.method == 'create') {
+              icon.classList.remove('far')
+              icon.classList.add('fas')
+              icon.id = 'like-for-partypost-icon'
+            } else {
+              icon.classList.remove('fas')
+              icon.classList.add('far')
+              icon.id = 'like-for-partypost-icon'
+            }
+          }).catch(error => {
+            console.log(error);
+          });
+        });
+      </script>
+    <!-- ↑いいね処理↑ -->
+    <script type="text/javascript" src="{% static 'pzdrapp/js/jquery-3.6.3.min.js' %}"></script>
+    <script type="text/javascript">
+      // リプ欄を表示させる処理
+      function createReplyHtml(reply_dic) {
+          return '<div class="reply">' +
+                    '<div class="three-dot-leader" type="button">' +
+                    '<span class="dot"></span>' +
+                    '<ul class="operation-menu">' +
+                      '<li>' +
+                        '<button class="">編集</button>' +
+                      '</li>' +
+                      '<li>' +
+                        `<button class="ajax-delete-comment-button" onclick="delete_comment_confirmation('${ reply_dic.reply_pk }')">削除</button>` +
+                      '</li>' +
+                    '</ul>' +
+                  '</div>' +
+                  '<div class="user-info">' +
+                    `<img src="${ reply_dic.user_img_url }" alt="リプライユーザー画像">` +
+                    `<p class="name">${ reply_dic.user_name }</p>` +
+                  '</div>' +
+                  `<p>${ reply_dic.text }</p>` +
+                  `<p class="date">${ reply_dic.timestamp }</p>` +
+                '</div>';
+      }
+      // ボタンを消す処理
+      delete_button = function(comment_pk){
+        const acquisitionReplyButton = document.getElementById(`reply-acquisition-button-${comment_pk}`);
+        acquisitionReplyButton.remove();
+      }
+      const replyAcquistionButtons = document.getElementsByClassName('ajax-reply-acquisition-button');
+      console.log(replyAcquistionButtons)
+      for (const button of replyAcquistionButtons) {
+        button.addEventListener('click', e => {
+          const pk = button.dataset.pk
+          e.preventDefault();
+          const url = '{% url "reply-acquisition" %}';
+          fetch(url, {
+            method: 'POST',
+            body: `comment_pk=${pk}`,
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+              'X-CSRFToken': '{{ csrf_token }}',
+            },
+          }).then(response => {
+            return response.json();
+          }).then(response => {
+            reply_dic = response.reply_dic
+
+            delete_button(pk);
+
+            for (var key in reply_dic) {
+              $(`#reply-zone-${pk}`).append(createReplyHtml(reply_dic[key]));
+            }
+            indicate_operation_menu()
+          }).catch(error => {
+            console.log(error);
+          });
+        });
+      }
+    </script>
+
+  <script>
+    indicate_operation_menu = function() {
+      document.addEventListener("DOMContentLoaded", function() {
+        var menuIcons = document.querySelectorAll(".three-dot-leader");
+      
+        menuIcons.forEach(function(menuIcon) {
+          var menu = menuIcon.querySelector(".operation-menu");
+
+          menuIcon.addEventListener("click", function(event) {
+            menu.classList.toggle("dis-block");
+          });
+      
+          document.addEventListener("click", function(event) {
+            if (!menuIcon.contains(event.target)) {
+              menu.classList.remove("dis-block");
+            }
+          });
+        });
+      });
+    }
+    indicate_operation_menu()
+  </script>
+
+  <!-- ↓コメント削除処理↓ -->
+  <script type="text/javascript">
+    // ↓削除処理定義↓
+    delete_comment = function(comment_pk) {
+      const pk = comment_pk
+          const url = '{% url "delete-comment" %}';
+          fetch(url, {
+            method: 'POST',
+            body: `comment_pk=${pk}`,
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+              'X-CSRFToken': '{{ csrf_token }}',
+            },
+          }).then(response => {
+            return response.json();
+          }).then(response => {
+            // views実行後の処理
+          }).catch(error => {
+            console.log(error);
+          });
+    }
+    function delete_comment_confirmation(comment_pk){
+      // 「OK」時の処理開始 ＋ 確認ダイアログの表示
+      if(window.confirm('本当に削除しますか？')){
+        delete_comment(comment_pk)
+        }
+      // 「OK」時の処理終了
+
+      // // 「キャンセル」時の処理開始
+      // else{
+
+      //   window.alert('キャンセルされました'); // 警告ダイアログを表示
+
+      // }
+    }
+  </script>
+{% endblock content %}

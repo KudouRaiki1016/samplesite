@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}編成登録{% endblock title %}
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{% static 'pzdrapp/css/create_partypost.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
+    {% endblock header %}
+{% block h1 %}編成登録{% endblock %}
+
+{% block content %}
+<form method="post" class="p-4 m-4 bg-light border border-success rounded form-group" enctype='multipart/form-data'>
+    {% csrf_token %}
+    {% for error in errors %}
+    <div class="alert alert-danger mb-4" role="alert">
+        <strong>{{ error }}</strong>
+    </div>
+    {% endfor %}
+    <label>
+        タイトル
+    </label>
+    <input class="form-control" name="title" value="">
+    <label>
+        写真
+    </label>
+    <input type="file" name="thumbnail">
+    <div class="col-lg-6">
+        <div class="mb-4" name="skillboost">
+            <label>スキルブースト</label>
+            {{ awakeningform.skillboost }}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="mb-4" name="sealed_resistance">
+            <label>封印耐性</label>
+            {{ awakeningform.sealed_resistance }}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="mb-4" name="poison_resistance">
+            <label>毒耐性</label>
+            {{ awakeningform.poison_resistance }}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="mb-4" name="obstacle_resistance">
+            <label>お邪魔耐性</label>
+            {{ awakeningform.obstacle_resistance }}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="mb-4" name="darkness_resistance">
+            <label>暗闇耐性</label>
+            {{ awakeningform.darkness_resistance }}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="mb-4" name="operation_resistance">
+            <label>操作不可耐性</label>
+            {{ awakeningform.operation_resistance }}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="" name="cloud_resistance">
+            <label>雲</label>
+            {{ awakeningform.cloud_resistance }}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="mb-4" name="operation_time">
+            <label>操作時間</label>
+            {{ awakeningform.operation_time }}
+        </div>
+    </div>
+    <label>
+        説明欄
+    </label>
+    <input type="text" class="form-control" name="text">
+    <button type="submit" class="btn btn-success mt-4">投稿する</button>
+    <h4>aiueo</h4>
+</form>
+{% endblock content %}

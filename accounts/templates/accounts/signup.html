@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}アカウント作成{% endblock %}
+{% block h1 %}アカウント作成{% endblock %}
+{% block content %}
+    <form action="", method="post" class="p-4 m-4 bg-light border border-success rounded form-group">
+        {% csrf_token %}
+        <input type="text" name="profilename" required class="form-control my-4" maxlength="20" placeholder="名前（２０文字まで）">
+        <input type="text" name="username" class="form-control my-4" placeholder="ユーザーID">
+        <label>プロフィール画像</label>
+        <input type="file" name="image" class="form-control my-4">
+        <textarea name="self_introduction_text" cols="40" rows="10" maxlength="200" placeholder="紹介文（２００文字まで）"></textarea>
+        <input type="password" name="password1" class="form-control mt-4" placeholder="パスワード">
+        <input type="password" name="password2" class="form-control mt-4" placeholder="パスワード確認用">
+        <small class="mb-2 d-block text-start">パスワードは8文字以上で設定してください。</small>
+        {% if form.errors %}
+            <span class="mb-2 small text-danger d-block tezt-start">利用できないユーザーIDやパスワードの可能性があります。入力内容を再度ご確認ください。</span>
+        {% endif %}
+        <button type="submit" class="btn btn-success m-2">アカウント作成</button>
+    </form>
+{% endblock %}

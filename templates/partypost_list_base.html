@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pzdrapp %}
+<!-- ↓読み込むhtmlファイルでプラスで記述すべきもの(block)↓
+・block title
+・block header_ ヘッダーに組み込みたいもの
+・block h1 サイトの頭にh1タグで表示するもの
+・block content_before_partypost 投稿一覧の前に持ってきたい内容
+・block content_after_partypost 投稿一覧の後に持ってきたい内容
+ -->
+<!-- ↓viewsで渡すデータ↓ 
+・ 'partypost_list'...表示する投稿リスト（QuerySetのような）
+・ 'liked_dic'...投稿ごとのいいね詳細が詰まっている辞書 ⇨ {7: {'count': 10, 'is_user_liked_for_partypost': False}, 9: ...}
+-->
+{% block header %}
+<link rel="stylesheet" href="{% static 'pzdrapp/css/partypost_list.css'%}"> <!-- 投稿に関する表示設定をしているファイル -->
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
+{% block add_header %}{% endblock add_header %}
+{% endblock header %}
+{% block content %}
+    {% block content_before_partypost %}{% endblock content_before_partypost %}
+    <!-- ~~~~~↓表示非表示切替↓~~~~~ -->
+    <div class="display-change-settings t-center">
+        <h2>表示切り替え</h2>
+        <div class="display-button">
+            <input value="" id="title-button" type="checkbox" checked class="title-button">
+            <label for="title-button">タイトル</label>
+        </div>
+        <div class="display-button">
+            <input value="" id="user-button" type="checkbox" checked class="user-button">
+            <label for="user-button">投稿者</label>
+        </div>
+        <div class="display-button">
+            <input value="" id="thumbnail-button" type="checkbox" checked class="thumbnail-button">
+            <label for="thumbnail-button">写真</label>
+        </div>
+        <div class="display-button">
+            <input value="" id="awakenings-button" type="checkbox" checked class="awakenings-button">
+            <label for="awakenings-button">覚醒</label>
+        </div>
+        <div class="display-button">
+            <input value="" id="text-button" type="checkbox" checked class="text-button">
+            <label for="text-button">説明欄</label>
+        </div>
+        <div class="display-button">
+            <input value="" id="like_for_partypost-button" type="checkbox" checked class="like_for_partypost-button">
+            <label for="like_for_partypost-button">いいね</label>
+        </div>
+    </div>
+    <!-- ~~~~~↑表示非表示切替↑~~~~~ -->
+    
+    <!-- ↓対象ユーザーの投稿一覧↓ -->
+    {% for partypost in partypost_list %}
+        <div class="partypost_list">
+            <h2 class="t-center partypost_title_dis" id="partypost_title">{{ partypost.title }}</h2>
+            <div class="partypost_user_dis t-center">
+                <p>投稿者</p>
+                {% if partypost.user.profile.image %}
+                <img src="{{ partypost.user.profile.image.url }}" alt="プロフィール画像" class="w-25 p-3 rounded-circle">
+                {% else %}
+                <div class="profile_img_substitute"></div>
+                {% endif %}
+                
+            </div>
+            <div class="t-center partypost_text_dis">
+                <h3>説明欄</h3>
+                <p class="partypost_text">{{ partypost.text }}</p>
+            </div>
+            <!-- ↓いいね表示↓ -->
+            <div class="t-center like_for_partypost_dis">
+                <!-- templatetagのメソッドで、中の辞書をdicという変数に変換 -->
+                {% with liked_dic|get_item:partypost.pk as dic %}
+                {% if dic.is_user_liked_for_partypost %}
+                <button type="button" class="ajax-like-for-partypost" data-pk="{{ partypost.pk }}" style="border:none;background:none">
+                    <i class="fas fa-heart text-danger" id="like-for-partypost-icon-{{ partypost.pk }}"></i>
+                </button>
+                {% else %}
+                <button type="button" class="ajax-like-for-partypost" data-pk="{{ partypost.pk }}" style="border:none;background:none">
+                    <i class="far fa-heart text-danger" id="like-for-partypost-icon-{{ partypost.pk }}"></i>
+                </button>
+                {% endif %}
+                <!-- イイねの数 -->
+                <span id="like-for-partypost-count-{{ partypost.pk }}">{{ dic.count }}</span>
+                <span>件のイイね</span>
+                {% endwith %}
+            </div>
+            <!-- ↑いいね表示↑ -->
+        </div>
+    {% endfor %}
+    <!-- ↑対象ユーザーの投稿一覧↑ -->
+    
+    <!-- ↓表示非表示一覧処理↓ -->
+    <script src="{% static 'pzdrapp/js/jquery.min.js'%}"></script>
+    <script>
+        $(function() {
+            $(".title-button").click(function() { // 『class名が"title-button"の』ボタンを押すと...
+                $(".partypost_title_dis").slideToggle(""); // 『class名が"partypost_title_dis"の』領域がslideToggle（非表示に）される
+            });
+        });
+        $(function() {
+            $(".user-button").click(function() { // 『class名が"user-button"の』ボタンを押すと...
+                $(".partypost_user_dis").slideToggle(""); // 『class名が"partypost_user_dis"の』領域がslideToggle（非表示に）される
+            });
+        });
+        $(function() {
+            $(".text-button").click(function() { // 『class名が"text-button"の』ボタンを押すと...
+                $(".partypost_text_dis").slideToggle(""); // 『class名が"partypost_text_dis"の』領域がslideToggle（非表示に）される
+            });
+        });
+        $(function() {
+            $(".like_for_partypost-button").click(function() { // 『class名が"like_for_partypost-button"の』ボタンを押すと...
+                $(".like_for_partypost_dis").slideToggle(""); // 『class名が"like_for_partypost_dis"の』領域がslideToggle（非表示に）される
+            });
+        });
+    </script>
+    <!-- ↑表示非表示一覧処理↑ -->
+    <!-- ↓いいね処理↓ -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.0.0/mdb.min.js"></script>
+    <script type="text/javascript">
+    const likePartypostButtons = document.getElementsByClassName('ajax-like-for-partypost');
+    console.log(likePartypostButtons)
+    for (const button of likePartypostButtons) {
+        button.addEventListener('click', e => {
+        const pk = button.dataset.pk
+        e.preventDefault();
+        const url = '{% url "like_for_partypost" %}';
+        fetch(url, {
+            method: 'POST',
+            body: `partypost_pk=${pk}`,
+            headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+            'X-CSRFToken': '{{ csrf_token }}',
+            },
+        }).then(response => {
+            return response.json();
+        }).then(response => {
+            const counter = document.getElementById(`like-for-partypost-count-${pk}`)
+            const icon = document.getElementById(`like-for-partypost-icon-${pk}`)
+            counter.textContent = response.like_for_partypost_count
+            if (response.method == 'create') {
+            icon.classList.remove('far')
+            icon.classList.add('fas')
+            icon.id = `like-for-partypost-icon-${pk}`
+            } else {
+            icon.classList.remove('fas')
+            icon.classList.add('far')
+            icon.id = `like-for-partypost-icon-${pk}`
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+        });
+    }
+    </script>
+    <!-- ↑いいね処理↑ -->
+    {% block content_after_partypost %}{% endblock content_after_partypost %}
+{% endblock content %}

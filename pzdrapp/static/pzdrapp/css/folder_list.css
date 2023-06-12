@@ -1,0 +1,22 @@
+.oneFolder {
+    background-color: azure;
+    display: flex;
+    margin: 15px auto;
+}
+.img_substitute {
+    background-color: #CCCCCC;
+    height: 130px;
+    width: 130px;
+}
+.post_thumbnail img {
+    height: 130px;
+    width: 130px;
+    max-width: 130px;
+    max-height: 130px;
+}
+.folderTitle {
+    margin: auto 0 auto 8%;
+}
+hr {
+    margin: auto 0 auto auto;
+}

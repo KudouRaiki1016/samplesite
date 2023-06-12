@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}フォルダ並び替え{% endblock title %}
+{% block h1 %}フォルダ並び替え{% endblock %}
+
+{% block content %}
+<form method='post' class='form' name="form">{% csrf_token %}
+    <div id="listWithHandle" class="list-group">
+        {% for folder in sorted_folders_list %}
+        <div class="wrap list-group-item" data-name="{{ folder.id }}">
+            <div class="d-flex">
+                <h2 class="text-success align-self-center aaa">{{ folder.title }}</h2>
+                {% if folder.thumbnail %}
+                    <img src="{{ folder.thumbnail.url }}" height="200"/>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+<input type="hidden" name='submit' value="">
+<button type="submit" class="btn btn-success mt-4" onclick="return_sort()">決定する</button>
+</form>
+<script src="{% static 'pzdrapp/js/Sortable.min.js' %}"></script>
+<script src="{% static 'pzdrapp/js/jquery-3.6.3.min.js' %}"></script>
+<script>
+    // ↓画面上での並び替えの処理（並び替え状況をboxで管理する）↓
+    $(function(){
+        // init();
+        Sortable.create(listWithHandle, {
+        animation: 150,
+        onUpdate: function (e) {
+            var box = [];
+            $('.wrap').each(function(index, element){
+            box.push($(element).data('name'));
+            });
+            console.log(box)
+            },
+      });
+    });
+
+    // ↓決定ボタンを押した時の処理（その時の並び替え順を『box』に詰めてviewsに渡す）↓
+    return_sort = function(){
+        var box = [];
+            $('.wrap').each(function(index, element){
+            box.push($(element).data('name'));
+            });
+        document.form.submit.value = box; //submitのvalueにboxを代入する
+    }
+</script>
+{% endblock content %}

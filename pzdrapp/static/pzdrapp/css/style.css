@@ -1,0 +1,26 @@
+body {
+    font-size: 100%;
+}
+header {
+    background-color: #B0E51F;
+}
+h1 {
+    font-size: 2.0rem;
+}
+img {
+    object-fit: cover;
+}
+.t-center {
+    text-align: center;
+}
+.dis-none {
+    display: none;
+}
+.dis-block {
+    display: block !important;
+}
+.profile_img img {
+    border-radius: 100%;
+    width: 50px;
+    height: 50px;
+}

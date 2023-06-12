@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% endblock title %}
+{% block h1 %}編成一覧{% endblock %}
+
+{% block content %}
+{% for partypost in object_list %}
+    <div class="partypost_list">
+        <h2 class="t-center">{{ partypost.title }}</h2>
+        <div class="name_img_div">
+            {% if object.image %}
+            <div><img src="" alt="プロフィール画像"></div>
+            {% else %}
+            <div class="img_substitute" alt="プロフィール画像なし"></div>
+            {% endif %}
+            <b>{{ object.name }}</b>
+        </div>
+        <p class="partypost_thumbnail t-center"><img src="{{ partypost.thumbnail.url }}"/><br></p>
+        <table>
+            <tr>
+                <th class="t-center"><img src="{% static 'pzdrapp/media/skillboost_icon.png' %}"></th>
+                <th class="t-center"><img src="{% static 'pzdrapp/media/sealed_resistance_icon.png' %}"></th>
+                <th class="t-center"><img src="{% static 'pzdrapp/media/poison_registance_icon.png' %}"></th>
+                <th class="t-center"><img src="{% static 'pzdrapp/media/obstacle_resistance_icon.png' %}"></th>
+            </tr>
+            <tr>
+                <td class="t-center">{{ partypost.awakenings.skillboost }}個</td>
+                <td class="t-center">{{ partypost.awakenings.sealed_resistance }}%</td>
+                <td class="t-center">{{ partypost.awakenings.poison_resistance }}%</td>
+                <td class="t-center">{{ partypost.awakenings.obstacle_resistance }}%</td>
+            </tr>
+            <tr>
+                <th class="t-center"><img src="{% static 'pzdrapp/media/darkness_resistance_icon.png' %}"></th>
+                <th class="t-center"><img src="{% static 'pzdrapp/media/operation_resistance_icon.png' %}"></th>
+                <th class="t-center"><img src="{% static 'pzdrapp/media/cloud_resistance_icon.png' %}"></th>
+                <th class="t-center"><img src="{% static 'pzdrapp/media/operation_time_icon.png' %}"></th>
+            </tr>
+            <tr>
+                <td class="t-center">{{ partypost.awakenings.darkness_resistance }}%</td>
+                {% if partypost.awakenings.operation_resistance %}
+                    <td class="t-center">○</td>
+                {% else %}
+                    <td class="t-center">×</td>
+                {% endif %}
+                {% if partypost.awakenings.cloud_resistance %}
+                    <td class="t-center">○</td>
+                {% else %}
+                    <td class="t-center">×</td>
+                {% endif %}
+                <td class="t-center">{{ partypost.awakenings.operation_time }}秒</td>
+            </tr>
+        </table>
+        <div class="t-center">
+            <h3>説明欄</h3>
+            <p class="partypost_text">{{ partypost.text }}</p>
+        </div>
+        <div>
+            <a href="{% url 'detail-partypost' partypost.id %}" class="btn btn-outline-primary">詳細を見る</a>
+        </div>
+    </div>
+{% endfor %}
+{% endblock content %}

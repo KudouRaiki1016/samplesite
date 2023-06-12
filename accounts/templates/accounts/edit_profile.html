@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}プロフィール編集{% endblock %}
+{% block h1 %}プロフィール編集{% endblock %}
+{% block content %}
+<form action="", method="post" class="p-4 m-4 bg-light border border-success rounded form-group">
+    {% csrf_token %}
+    <input type="text" name="profilename" required class="form-control my-4" maxlength="20" value="{{ profile.name }}" placeholder="名前">
+    <label>プロフィール画像</label>
+    <input type="file" name="image" class="form-control my-4">
+    {% if profile.self_introduction_text %}
+    <textarea name="self_introduction_text" cols="40" rows="10" maxlength="200" placeholder="紹介文（２００文字まで）">{{ profile.self_introduction_text }}</textarea>
+    {% else %}
+    <textarea name="self_introduction_text" cols="40" rows="10" maxlength="200" placeholder="紹介文（２００文字まで）"></textarea>
+    {% endif %}
+    {% if error %}
+        <span class="mb-2 small text-danger d-block tezt-start">{{ error }}</span>
+    {% endif %}
+    <button type="submit" class="btn btn-success m-2">完了</button>
+</form>
+{% endblock %}

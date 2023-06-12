@@ -1,0 +1,30 @@
+{% load pzdrapp %}
+<div class="comment">
+    <div class="user-info">
+        {% if object.user.profile.image %}
+            <p class="profile_img"><img src="{{ comment.user.profile.image.url }}" alt="プロフィール画像"></p>
+        {% else %}
+            <p class="profile_img_substitute"></p>
+        {% endif %}
+        <p class="name">{{ comment.user.profile.name }}</p>
+    </div>
+    <p>{{ comment.text }}</p>
+    <p class="date">{{ comment.timestamp }}</p>
+    <div class="three-dot-leader" type="button">
+        <span class="dot"></span>
+        <ul class="operation-menu">
+            <li>
+                <button class="">編集</button>
+            </li>
+            <li>
+                <button class="ajax-delete-comment-button" onclick="delete_comment_confirmation('{{ comment.pk }}')">削除</button>
+            </li>
+        </ul>
+    </div>
+    {% with reply_for_comment_dic|get_item:comment.pk as replys %}
+        {% if replys.exists %}
+            <button class="ajax-reply-acquisition-button" id="reply-acquisition-button-{{ comment.pk }}" data-pk="{{ comment.pk }}">{{ replys.len }}件の返信</button>
+            <div id="reply-zone-{{comment.pk}}"></div>
+        {% endif %}
+    {% endwith %}
+</div>

@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pzdrapp %}
+
+{% block header %}
+  <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/detail_profile.css' %}">
+  <link rel="stylesheet" href="{% static 'pzdrapp/css/partypost_list_infolder.css'%}">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
+{% endblock header %}
+{% block title %}アカウント画面{% endblock %}
+{% block h1 %}アカウント画面{% endblock %}
+{% block content %}
+<div class="name_img_editbutton_following_follower_div">
+    <div class="name_img_div">
+        {% if object.image %}
+        <div><img src="" alt="プロフィール画像"></div>
+        {% else %}
+        <div class="img_substitute" alt="プロフィール画像なし"></div>
+        {% endif %}
+        <b>{{ object.name }}</b>
+    </div>
+    <div class="editbutton_following_follower_div">
+        <div>
+            <!--もしプロフィールの遷移先が自分のプロフィールである場合の表示ボタン-->
+            {% if request.user.profile.pk == object.pk %}
+                <a href="{% url 'accounts:update-profile' object.pk %}" class="btn btn-info">プロフィール編集</a>
+            <!--プロフィールの遷移先が自分がフォローしているユーザーの場合の表示ボタン-->
+            {% elif connected %}
+            <button class="btn btn-dark ajax-follow-button" data-pk="{{ object.pk }}" id="follow-button">フォロー解除</button>
+            <!--自分がフォローしていないユーザーの場合の表示ボタン-->
+            {% else %}
+            <button class="btn btn-light ajax-follow-button" data-pk="{{ object.pk }}" id="follow-button">フォロー</button>
+            {% endif %}
+        </div>
+
+        <div class="following_follower_div">
+            <ul class="following_follower_ul">
+                <li>
+                  <a href="{% url 'accounts:list-following' object.pk %}">
+                      <!--フォロー数を表示-->
+                      <p>フォロー数</p>
+                      <h2>{{ following }}</h2>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'accounts:list-follower' object.pk %}">
+                    <!--フォロワー数を表示-->
+                    <p>フォロワー数</p>
+                    <h2>{{ follower }}</h2>
+                  </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ~~~~~↓表示非表示切替↓~~~~~ -->
+<div class="display-change-settings t-center">
+  <h2>表示切り替え</h2>
+  <div class="display-button">
+      <input value="" id="title-button" type="checkbox" checked class="title-button">
+      <label for="title-button">タイトル</label>
+  </div>
+  <div class="display-button">
+      <input value="" id="user-button" type="checkbox" checked class="user-button">
+      <label for="user-button">投稿者</label>
+  </div>
+  <div class="display-button">
+      <input value="" id="thumbnail-button" type="checkbox" checked class="thumbnail-button">
+      <label for="thumbnail-button">写真</label>
+  </div>
+  <div class="display-button">
+      <input value="" id="awakenings-button" type="checkbox" checked class="awakenings-button">
+      <label for="awakenings-button">覚醒</label>
+  </div>
+  <div class="display-button">
+      <input value="" id="text-button" type="checkbox" checked class="text-button">
+      <label for="text-button">説明欄</label>
+  </div>
+  <div class="display-button">
+      <input value="" id="like_for_partypost-button" type="checkbox" checked class="like_for_partypost-button">
+      <label for="like_for_partypost-button">いいね</label>
+  </div>
+</div>
+<!-- ~~~~~↑表示非表示切替↑~~~~~ -->
+
+<!-- ↓対象ユーザーの投稿一覧↓ -->
+{% for partypost in partypost_list %}
+    <div class="partypost_list">
+        <h2 class="t-center partypost_title_dis" id="partypost_title">{{ partypost.title }}</h2>
+        <div class="partypost_user_dis t-center">
+            <p>投稿者</p>
+            {% if partypost.user.profile.image %}
+            <img src="{{ partypost.user.profile.image.url }}" alt="プロフィール画像">
+            {% else %}
+            <div class="profile_img_substitute"></div>
+            {% endif %}
+            
+        </div>
+        <p class="partypost_thumbnail_dis t-center"><img src="{{ partypost.thumbnail.url }}"/><br></p>
+        <div class="partypost_awakenings_dis">
+            <table>
+                <tr>
+                    <th class="t-center"><img src="{% static 'pzdrapp/media/skillboost_icon.png' %}"></th>
+                    <th class="t-center"><img src="{% static 'pzdrapp/media/sealed_resistance_icon.png' %}"></th>
+                    <th class="t-center"><img src="{% static 'pzdrapp/media/poison_registance_icon.png' %}"></th>
+                    <th class="t-center"><img src="{% static 'pzdrapp/media/obstacle_resistance_icon.png' %}"></th>
+                </tr>
+                <tr>
+                    <td class="t-center">{{ partypost.awakenings.skillboost }}個</td>
+                    <td class="t-center">{{ partypost.awakenings.sealed_resistance }}%</td>
+                    <td class="t-center">{{ partypost.awakenings.poison_resistance }}%</td>
+                    <td class="t-center">{{ partypost.awakenings.obstacle_resistance }}%</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <th class="t-center"><img src="{% static 'pzdrapp/media/darkness_resistance_icon.png' %}"></th>
+                    <th class="t-center"><img src="{% static 'pzdrapp/media/operation_resistance_icon.png' %}"></th>
+                    <th class="t-center"><img src="{% static 'pzdrapp/media/cloud_resistance_icon.png' %}"></th>
+                    <th class="t-center"><img src="{% static 'pzdrapp/media/operation_time_icon.png' %}"></th>
+                </tr>
+                <tr>
+                    <td class="t-center">{{ partypost.awakenings.darkness_resistance }}%</td>
+                    {% if partypost.awakenings.operation_resistance %}
+                        <td class="t-center">○</td>
+                    {% else %}
+                        <td class="t-center">×</td>
+                    {% endif %}
+                    {% if partypost.awakenings.cloud_resistance %}
+                        <td class="t-center">○</td>
+                    {% else %}
+                        <td class="t-center">×</td>
+                    {% endif %}
+                    <td class="t-center">{{ partypost.awakenings.operation_time }}秒</td>
+                </tr>
+            </table>
+        </div>
+        <div class="t-center partypost_text_dis">
+            <h3>説明欄</h3>
+            <p class="partypost_text">{{ partypost.text }}</p>
+        </div>
+        <!-- ↓いいね表示↓ -->
+        <div class="t-center like_for_partypost_dis">
+          <!-- templatetagのメソッドで、中の辞書をdicという変数に変換 -->
+          {% with liked_dic|get_item:partypost.pk as dic %}
+          {% if dic.is_user_liked_for_partypost %}
+          <button type="button" class="ajax-like-for-partypost" data-pk="{{ partypost.pk }}" style="border:none;background:none">
+              <i class="fas fa-heart text-danger" id="like-for-partypost-icon-{{ partypost.pk }}"></i>
+          </button>
+          {% else %}
+          <button type="button" class="ajax-like-for-partypost" data-pk="{{ partypost.pk }}" style="border:none;background:none">
+              <i class="far fa-heart text-danger" id="like-for-partypost-icon-{{ partypost.pk }}"></i>
+          </button>
+          {% endif %}
+          <!-- イイねの数 -->
+          <span id="like-for-partypost-count-{{ partypost.pk }}">{{ dic.count }}</span>
+          <span>件のイイね</span>
+          {% endwith %}
+      </div>
+      <!-- ↑いいね表示↑ -->
+    </div>
+{% endfor %}
+<!-- ↑対象ユーザーの投稿一覧↑ -->
+
+<!-- ↓表示非表示一覧処理↓ -->
+<script src="{% static 'pzdrapp/js/jquery.min.js'%}"></script>
+<script>
+  $(function() {
+      $(".title-button").click(function() { // 『class名が"title-button"の』ボタンを押すと...
+          $(".partypost_title_dis").slideToggle(""); // 『class名が"partypost_title_dis"の』領域がslideToggle（非表示に）される
+      });
+  });
+  $(function() {
+      $(".user-button").click(function() { // 『class名が"user-button"の』ボタンを押すと...
+          $(".partypost_user_dis").slideToggle(""); // 『class名が"partypost_user_dis"の』領域がslideToggle（非表示に）される
+      });
+  });
+  $(function() {
+      $(".thumbnail-button").click(function() { // 『class名が"thumbnail-button"の』ボタンを押すと...
+          $(".partypost_thumbnail_dis").slideToggle(""); // 『class名が"partypost_thumbnail_dis"の』領域がslideToggle（非表示に）される
+      });
+  });
+  $(function() {
+      $(".awakenings-button").click(function() { // 『class名が"awakenings-button"の』ボタンを押すと...
+          $(".partypost_awakenings_dis").slideToggle(""); // 『class名が"partypost_awakenings_dis"の』領域がslideToggle（非表示に）される
+      });
+  });
+  $(function() {
+      $(".text-button").click(function() { // 『class名が"text-button"の』ボタンを押すと...
+          $(".partypost_text_dis").slideToggle(""); // 『class名が"partypost_text_dis"の』領域がslideToggle（非表示に）される
+      });
+  });
+  $(function() {
+      $(".like_for_partypost-button").click(function() { // 『class名が"like_for_partypost-button"の』ボタンを押すと...
+          $(".like_for_partypost_dis").slideToggle(""); // 『class名が"like_for_partypost_dis"の』領域がslideToggle（非表示に）される
+      });
+  });
+</script>
+<!-- ↑表示非表示一覧処理↑ -->
+
+<!-- ↓フォロー・フォロー解除処理↓ -->
+<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.0.0/mdb.min.js"></script> -->
+<script type="text/javascript">
+    const followButton = document.getElementsByClassName('ajax-follow-button'); // 処理を行うためのボタン（class指定）
+    console.log(followButton)
+    for (const button of followButton) { // ボタンの数分繰り返し処理
+      button.addEventListener('click', e => {
+        var pk = button.dataset.pk
+        // console.log(pk)
+        e.preventDefault();
+        const url = '{% url "accounts:follow" %}'; // 処理のurl指定
+        fetch(url, {
+          method: 'POST',
+          body: `object_pk=${pk}`, // viewsに渡す変数
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+            'X-CSRFToken': '{{ csrf_token }}',
+          },
+        }).then(response => {
+          return response.json();
+        }).then(response => {
+          // 処理に合わせて表示を変える
+        //   followbutton.textContent = response.like_for_partypost_count
+        const button_from_id = document.getElementById("follow-button") // フォローボタンをidで取得
+        console.log(button_from_id.classList)
+        if (response.method == 'create') {
+          button_from_id.classList.remove('btn-light')
+          button_from_id.classList.add('btn-dark')
+          button_from_id.textContent = 'フォロー解除'
+        } else {
+          button_from_id.classList.remove('btn-dark')
+          button_from_id.classList.add('btn-light')
+          button_from_id.textContent = 'フォロー'
+        }
+        }).catch(error => {
+          console.log(error);
+        });
+      });
+    }
+  </script>
+<!-- ↑フォロー・フォロー解除処理↑ -->
+
+<!-- ↓いいね処理↓ -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.0.0/mdb.min.js"></script>
+<script type="text/javascript">
+  const likePartypostButtons = document.getElementsByClassName('ajax-like-for-partypost');
+  console.log(likePartypostButtons)
+  for (const button of likePartypostButtons) {
+    button.addEventListener('click', e => {
+      const pk = button.dataset.pk
+      e.preventDefault();
+      const url = '{% url "like_for_partypost" %}';
+      fetch(url, {
+        method: 'POST',
+        body: `partypost_pk=${pk}`,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+      }).then(response => {
+        return response.json();
+      }).then(response => {
+        const counter = document.getElementById(`like-for-partypost-count-${pk}`)
+        const icon = document.getElementById(`like-for-partypost-icon-${pk}`)
+        counter.textContent = response.like_for_partypost_count
+        if (response.method == 'create') {
+          icon.classList.remove('far')
+          icon.classList.add('fas')
+          icon.id = `like-for-partypost-icon-${pk}`
+        } else {
+          icon.classList.remove('fas')
+          icon.classList.add('far')
+          icon.id = `like-for-partypost-icon-${pk}`
+        }
+      }).catch(error => {
+        console.log(error);
+      });
+    });
+  }
+</script>
+<!-- ↑いいね処理↑ -->
+  
+{% endblock %}

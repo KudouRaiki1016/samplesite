@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}フォルダ作成{% endblock title %}
+{% block h1 %}フォルダ作成{% endblock %}
+
+{% block content %}
+<form method="post" class="p-4 m-4 bg-light border border-success rounded form-group" enctype='multipart/form-data'>{% csrf_token %}
+    <p>
+        <label for="id_title">フォルダ名:</label>
+        <input type="text" name="title" value="" maxlength="100" required="" id="id_title">
+    </p>
+    <p>
+    <label for="id_thumbnail">画像:</label>
+    <input type="file" name="thumbnail" accept="image/*" id="id_thumbnail">
+    </p>
+    <p>
+    <label for="id_release">公開・非公開:</label>
+    <select name="release" required="" id="id_release">
+    <option value="True" selected="">公開</option>
+    <option value="False">非公開</option>
+    </select>
+    </p>
+    <!-- <p>
+    <label for="id_user">User:</label>
+    <select name="user" required="" id="id_user">
+    <option value="">---------</option>
+
+    <option value="1">superuser</option>
+
+    <option value="3">3番目のユーザー</option>
+
+    </select>
+    </p> -->
+    <input type="hidden" name="user" id="id_user" value="{{ request.user.id }}">
+    <button type="submit" class="btn btn-success mt-4">フォルダ作成</button>
+</form>
+{% endblock content %}

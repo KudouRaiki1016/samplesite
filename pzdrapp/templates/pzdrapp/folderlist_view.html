@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block header %}<link rel="stylesheet" href="{% static 'pzdrapp/css/folder_list.css'%}">{% endblock header %}
+{% block title %}保存フォルダ一覧{% endblock title %}
+{% block h1 %}保存フォルダ一覧{% endblock %}
+
+{% block content %}
+<a href="{% url 'orderchange-folder' %}" class="btn btn-primary">フォルダ並び替え</a>
+    <a href="{% url 'create-folder' %}" class="dec-none">
+        <div class="oneFolder">
+            <div class="img_substitute">
+            </div>
+            <h2 class="folderTitle">新規フォルダ作成</h2>
+        </div>
+    </a>
+    <hr width="100%">
+    {% for folder in folder_list %}
+        <!-- ↓この領域は全てリンク先に行くようにしたい（aタグだと文字がリンク先になってしまう？）↓ -->
+        <a href="{% url 'list-partypost_in_folder' folder.pk %}" class="dec-none">
+            <div class="oneFolder">
+                {% if folder.thumbnail %}
+                    <div class="post_thumbnail t-center"><img src="{{ folder.thumbnail.url }}"/></div>
+                {% else %}
+                    <div class="img_substitute"></div>
+                {% endif %}
+                <h2 class="folderTitle">{{ folder.title }}</h2>
+            </div>
+        </a>
+        <hr width="100%">
+    {% endfor %}
+{% endblock content %}

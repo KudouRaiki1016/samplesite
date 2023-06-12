@@ -1,0 +1,33 @@
+.name_img_editbutton_following_follower_div {
+    display: flex;
+    justify-content: space-around;
+}
+
+.name_img_div {
+    display: block;
+    text-align: center;
+}
+.name_img_div img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+}
+
+.img_substitute {
+    background-color: #CCCCCC;
+    height: 80px;
+    width: 80px;
+    border-radius: 100px;
+    margin: 0 auto;
+}
+
+.following_follower_div {
+    text-align: center;
+}
+.following_follower_ul {
+    display: flex;
+}
+.following_follower_ul li {
+    white-space: nowrap;
+    margin: 30px 10%;
+}

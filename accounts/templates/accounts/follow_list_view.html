@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/detail_profile.css' %}">
+{% endblock header %}
+{% block title %}
+  {% if following_page %}
+    {{ follow.name }}のフォローアカウント
+  {% elif follower_page %}
+    {{ follow.name }}のフォロワーアカウント
+  {% endif %}
+{% endblock %}
+{% block h1 %}
+  {% if following_page %}
+    {{ follow.name }}のフォローアカウント
+  {% elif follower_page %}
+    {{ follow.name }}のフォロワーアカウント
+  {% endif %}
+{% endblock %}
+{% block content %}
+    {% for account in follow_list %}
+      <div class="p-4 m-4 bg-light border border-success rounded">
+        {{ account.name }}
+        {% if connected %}
+            <button class="btn btn-dark ajax-follow-button" data-pk="{{ account.pk }}" id="follow-button-{{ account.pk }}">フォロー解除</button>
+        {% else %}
+            <button class="btn btn-dark ajax-follow-button" data-pk="{{ account.pk }}" id="follow-button-{{ account.pk }}">フォロー解除</button>
+        {% endif %}
+      </div>
+    {% endfor %}
+<script type="text/javascript">
+    const followButtons = document.getElementsByClassName('ajax-follow-button'); // 処理を行うためのボタン（class指定）
+    console.log(followButtons)
+    for (const button of followButtons) { // ボタンの数分繰り返し処理
+      button.addEventListener('click', e => {
+        const pk = button.dataset.pk
+        e.preventDefault();
+        const url = '{% url "accounts:follow" %}'; // 処理のurl指定
+        fetch(url, {
+          method: 'POST',
+          body: `object_pk=${pk}`, // viewsに渡す変数
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+            'X-CSRFToken': '{{ csrf_token }}',
+          },
+        }).then(response => {
+          return response.json();
+        }).then(response => {
+          // 処理に合わせて表示を変える
+          const button_from_id = document.getElementById(`follow-button-${pk}`)
+        if (response.method == 'create') {
+          button_from_id.classList.remove('btn-light')
+          button_from_id.classList.add('btn-dark')
+          button_from_id.textContent = 'フォロー解除'
+        } else {
+          button_from_id.classList.remove('btn-dark')
+          button_from_id.classList.add('btn-light')
+          button_from_id.textContent = 'フォロー'
+        }
+        }).catch(error => {
+          console.log(error);
+        });
+      });
+    }
+  </script>
+{% endblock %}

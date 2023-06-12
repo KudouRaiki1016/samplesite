@@ -1,0 +1,83 @@
+/* ~~~~~ボタン関係の設定~~~~~ */
+.display-button{
+    display:inline-block;
+    position: relative;
+}
+.display-button input{
+    opacity: 0;
+    position: absolute;
+    left: 0;
+}
+.display-button label{
+    padding: 10px 20px;
+    border-radius: 20px;
+    background: #eee;
+    display: inline-block;
+    cursor: pointer;
+    transition: .5s;
+}
+/* .display-button label:hover, */
+.display-button input:checked + label{
+    background: #af975e;
+    color: #FFF;
+}
+.display-button input:focus + label{
+    box-shadow: 0 0 4px #af975e;
+}
+
+/* ~~~~~~~~~~ */
+
+/* ~~~~~投稿リスト関係の設定~~~~~ */
+/* 全体 */
+.partypost_list {
+    margin: 100px auto;
+}
+/* タイトル */
+.partypost_list h2 {
+    color: #ffffff;
+    background-color: #2B0404;
+    border-radius: 7px; /* 枠の丸み */
+    padding: 20px 0;
+    margin: 0 auto;
+    width: 80%;
+}
+/* 投稿者画像がない場合の表示 */
+.profile_img_substitute {
+    background-color: #CCCCCC;
+    height: 80px;
+    width: 80px;
+    border-radius: 100px;
+    margin: 0 auto;
+}
+/* 投稿の写真 */
+.partypost_list .partypost_thumbnail img {
+    width: 60%;
+    max-width: 95%;
+}
+table {
+    border-collapse:  collapse;
+    margin: 0 auto;
+    max-width: 90%;
+    table-layout: fixed; /* セルの幅を統一 */
+}
+table tr th {
+    border: solid 1px;
+    width: 8vw;
+    height: 8vw;
+}
+table tr th img {
+    width: 5vw;
+}
+table tr td {
+    border: solid 1px; 
+    padding: 10px 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+.partypost_text {
+    border: solid 1px;
+    max-width: 90%;
+    margin: 0 auto;
+}
+
+/* ~~~~~~~~~~ */
